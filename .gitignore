@@ -1,8 +1,7 @@
 venv/
-sources/
+
 *.pyc
 *.pyo
-*.csv
-*.log
-*.pkl
+
+
 ASL_marios.code-workspace
