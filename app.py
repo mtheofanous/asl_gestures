@@ -98,10 +98,13 @@ def main():
 
         # filter = "none"
         # Load the pre-trained model and label encoder
-        model_path = os.path.join("/Users/DELL/Desktop/ASL_marios/", "model_landmarks_augment.pkl")
-        le_path = os.path.join("/Users/DELL/Desktop/ASL_marios/", "label_encoder_augment.pkl")
-        model = joblib.load(model_path)
-        le = joblib.load(le_path)
+        uploaded_model = st.file_uploader("/Users/DELL/Desktop/ASL_marios/model_landmarks_augment.pkl", type=["pkl"])
+
+        uploaded_le = st.file_uploader("/Users/DELL/Desktop/ASL_marios/model_label_encoder_augment.pkl", type=["pkl"])
+        # model_path = os.path.join("/Users/DELL/Desktop/ASL_marios/", "model_landmarks_augment.pkl")
+        # le_path = os.path.join("/Users/DELL/Desktop/ASL_marios/", "label_encoder_augment.pkl")
+        model = joblib.load(uploaded_model)
+        le = joblib.load(uploaded_le)
 
         # Initialize mediapipe Hands
         mp_hands = mp.solutions.hands
