@@ -111,7 +111,7 @@ def main():
                 st.error(f"An error occurred: {e}")
         else:
             st.warning("Please upload the model and label encoder files.")
-            
+
         # Initialize mediapipe Hands
         mp_hands = mp.solutions.hands
         mp_drawing = mp.solutions.drawing_utils
@@ -172,7 +172,7 @@ def main():
                         smoothed_prediction = max(set(self.predictions), key=self.predictions.count)
 
                         # Update last predicted gesture
-                        self.last_predicted_gesture = f'Predicted Gesture: {smoothed_prediction}'
+                        # self.last_predicted_gesture = f'Predicted Gesture: {smoothed_prediction}'
 
                         # Draw a bounding box around the hand
                         x1, y1 = int(min(x_) * W) - 10, int(min(y_) * H) - 10
@@ -186,11 +186,11 @@ def main():
                 return av.VideoFrame.from_ndarray(img, format="bgr24")
 
         ctx = webrtc_streamer(key="streamer", video_frame_callback=VideoTransformer().transform, sendback_audio=False)
-        if ctx.video_transformer:
-            st.write("### Predictions")
-            st.write(ctx.video_transformer.last_predicted_gesture)
-            st.write("### Gesture History")
-            st.write(ctx.video_transformer.gesture_history)
+        # if ctx.video_transformer:
+        #     st.write("### Predictions")
+        #     st.write(ctx.video_transformer.last_predicted_gesture)
+        #     st.write("### Gesture History")
+        #     st.write(ctx.video_transformer.gesture_history)
 
 
 
