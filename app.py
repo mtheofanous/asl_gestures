@@ -11,6 +11,7 @@ import joblib
 import mediapipe as mp
 from collections import deque
 from streamlit_webrtc import webrtc_streamer, VideoTransformerBase
+from mediapipe.python.solutions.drawing_utils import DrawingSpec
 from data import visualizaciones_datasets, show_random_image
 import av
 import subprocess
@@ -24,12 +25,10 @@ st.set_page_config(page_title = "DSB01RT",
                    layout = "wide",
                    initial_sidebar_state = 'expanded')
 
-
 def main():
     st.title("ASL Gesture Recognition App.")
     st.write("Use the Menu to the left to go to the page of your choice.")
 
-    # st.sidebar.success("Navigation")
     menu = ["Home", "Data", "Real_time_Recognition"]
     choice = st.sidebar.selectbox("Menu", menu)
 
@@ -61,14 +60,17 @@ def main():
             - **Increased Robustness**: Hand landmarks provide a more invariant and robust representation of gestures compared to raw pixel data, which can be affected by variations in lighting, background, and other noise.
             - **Relevance**: Hand landmarks contain the essential information needed to distinguish between different ASL gestures, making them an efficient choice for classification.
         """)
+
     elif choice == "Data":
         st.header("Dataset Visualization")
 
         # Load the dataset
         csv_path = os.path.join("hand_landmarks_augment.csv")
-        df = pd.read_csv(csv_path)
-        df = pd.read_csv('/Users/DELL/Desktop/ASL_marios/hand_landmarks_augment.csv') 
-        
+        if os.path.exists(csv_path):
+            df = pd.read_csv(csv_path)
+        else:
+            st.error(f"Dataset file not found at path: {csv_path}")
+            return
 
         data_choice = st.sidebar.selectbox("Data Analysis", ["Show Dataset", "Label Distribution", "Show hand landmarks"])
 
@@ -78,37 +80,35 @@ def main():
 
         elif data_choice == "Label Distribution":
             st.write("### Label Distribution")
-            visualizaciones_datasets(df)
+            # Add your visualization function here, for example:
+            # visualizaciones_datasets(df)
 
         elif data_choice == "Show hand landmarks":
             st.write("### Hand Gesture Image")
             st.sidebar.write("### Hand Gesture Image")
             letter = st.sidebar.text_input("Enter a letter (A-Z):", 'B')
             if letter:
+                # Replace with the correct path to your images
                 show_random_image(letter, data_dir='/Users/DELL/Desktop/Project_3/asl_alphabet_test')
-    
-    elif choice == "Real_time_Recognition":
 
+    elif choice == "Real_time_Recognition":
         st.title("Live-Stream")
- 
+
         st.sidebar.success("Use the image grid below to practice ASL gestures. The app will recognize your gestures in real-time.")
         image_path = os.path.join("sources", "image_grid.jpg")
         st.sidebar.image(image_path, caption="Image Grid", use_column_width=True)
 
-
-        # filter = "none"
         # Load the pre-trained model and label encoder
-        model_file = st.file_uploader("/Users/DELL/Desktop/ASL_marios/model_landmarks_augment.pkl", type=["pkl"], key="model")
-        le_file = st.file_uploader("/Users/DELL/Desktop/ASL_marios/label_encoder_augment.pkl", type=["pkl"], key="le")
-        # model_path = os.path.join("/Users/DELL/Desktop/ASL_marios/", "model_landmarks_augment.pkl")
-        # le_path = os.path.join("/Users/DELL/Desktop/ASL_marios/", "label_encoder_augment.pkl")
+        model_file = st.file_uploader("Upload Model (.pkl)", type=["pkl"], key="model")
+        le_file = st.file_uploader("Upload Label Encoder (.pkl)", type=["pkl"], key="le")
+
         if model_file and le_file:
             try:
                 model = joblib.load(model_file)
                 le = joblib.load(le_file)
                 st.write("Model and Label Encoder loaded successfully!")
             except Exception as e:
-                st.error(f"An error occurred: {e}")
+                st.error(f"An error occurred while loading the model and label encoder: {e}")
         else:
             st.warning("Please upload the model and label encoder files.")
 
@@ -116,7 +116,6 @@ def main():
         mp_hands = mp.solutions.hands
         mp_drawing = mp.solutions.drawing_utils
         mp_drawing_styles = mp.solutions.drawing_styles
-        from mediapipe.python.solutions.drawing_utils import DrawingSpec
 
         # Customize the styles
         landmark_style = DrawingSpec(color=(0, 0, 0), thickness=2, circle_radius=2)
@@ -171,9 +170,6 @@ def main():
                         self.predictions.append(predicted_character)
                         smoothed_prediction = max(set(self.predictions), key=self.predictions.count)
 
-                        # Update last predicted gesture
-                        # self.last_predicted_gesture = f'Predicted Gesture: {smoothed_prediction}'
-
                         # Draw a bounding box around the hand
                         x1, y1 = int(min(x_) * W) - 10, int(min(y_) * H) - 10
                         x2, y2 = int(max(x_) * W) + 10, int(max(y_) * H) + 10
@@ -186,14 +182,15 @@ def main():
                 return av.VideoFrame.from_ndarray(img, format="bgr24")
 
         ctx = webrtc_streamer(key="streamer", video_frame_callback=VideoTransformer().transform, sendback_audio=False)
-        # if ctx.video_transformer:
-        #     st.write("### Predictions")
-        #     st.write(ctx.video_transformer.last_predicted_gesture)
-        #     st.write("### Gesture History")
-        #     st.write(ctx.video_transformer.gesture_history)
 
-
+        # Display predictions and history
+        if ctx.video_transformer:
+            st.write("### Predictions")
+            st.write(ctx.video_transformer.last_predicted_gesture)
+            st.write("### Gesture History")
+            st.write(ctx.video_transformer.gesture_history)
 
 if __name__ == "__main__":
     main()
+
     
