@@ -98,14 +98,20 @@ def main():
 
         # filter = "none"
         # Load the pre-trained model and label encoder
-        uploaded_model = st.file_uploader("/Users/DELL/Desktop/ASL_marios/model_landmarks_augment.pkl", type=["pkl"])
-
-        uploaded_le = st.file_uploader("/Users/DELL/Desktop/ASL_marios/model_label_encoder_augment.pkl", type=["pkl"])
+        model_file = st.file_uploader("/Users/DELL/Desktop/ASL_marios/model_landmarks_augment.pkl", type=["pkl"], key="model")
+        le_file = st.file_uploader("/Users/DELL/Desktop/ASL_marios/label_encoder_augment.pkl", type=["pkl"], key="le")
         # model_path = os.path.join("/Users/DELL/Desktop/ASL_marios/", "model_landmarks_augment.pkl")
         # le_path = os.path.join("/Users/DELL/Desktop/ASL_marios/", "label_encoder_augment.pkl")
-        model = joblib.load(uploaded_model)
-        le = joblib.load(uploaded_le)
-
+        if model_file and le_file:
+            try:
+                model = joblib.load(model_file)
+                le = joblib.load(le_file)
+                st.write("Model and Label Encoder loaded successfully!")
+            except Exception as e:
+                st.error(f"An error occurred: {e}")
+        else:
+            st.warning("Please upload the model and label encoder files.")
+            
         # Initialize mediapipe Hands
         mp_hands = mp.solutions.hands
         mp_drawing = mp.solutions.drawing_utils
