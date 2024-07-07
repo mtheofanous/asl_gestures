@@ -30,15 +30,16 @@ def main():
     st.write("Use the Menu to the left to go to the page of your choice.")
 
     # st.sidebar.success("Navigation")
-    menu = ["Home", "Data", "Model", "Prediction", "Real_time_Recognition"]
+    menu = ["Home", "Data", "Real_time_Recognition"]
     choice = st.sidebar.selectbox("Menu", menu)
 
     if choice == "Home":
         st.subheader("Home")
         st.write("Welcome to the ASL Gesture Recognition App.")
         st.write("This web app recognizes American Sign Language (ASL) gestures using hand landmarks.")
+        image_path = os.path.join("sources", "homepage_image.jpg")
         
-        st.image("/Users/DELL/Desktop/ASL_marios/sources/homepage_image.jpg", width = 400)
+        st.image(image_path)
         st.write("""
             ## Overview
             American Sign Language (ASL) is a complete language that uses gestures and visual signs to communicate with people who are deaf or hard of hearing. ASL has its own grammar and syntax, making it a fully-fledged language in its own right.
@@ -64,6 +65,8 @@ def main():
         st.header("Dataset Visualization")
 
         # Load the dataset
+        csv_path = os.path.join("hand_landmarks_augment.csv")
+        df = pd.read_csv(csv_path)
         df = pd.read_csv('/Users/DELL/Desktop/ASL_marios/hand_landmarks_augment.csv') 
         
 
@@ -89,14 +92,16 @@ def main():
         st.title("Live-Stream")
  
         st.sidebar.success("Use the image grid below to practice ASL gestures. The app will recognize your gestures in real-time.")
-
-        st.sidebar.image('/Users/DELL/Desktop/ASL_marios/sources/image_grid.jpg', caption="Image Grid", use_column_width=True)
+        image_path = os.path.join("sources", "image_grid.jpg")
+        st.sidebar.image(image_path, caption="Image Grid", use_column_width=True)
 
 
         # filter = "none"
         # Load the pre-trained model and label encoder
-        model = joblib.load('/Users/DELL/Desktop/ASL_marios/model_landmarks_augment.pkl')
-        le = joblib.load('/Users/DELL/Desktop/ASL_marios/label_encoder_augment.pkl')
+        model_path = os.path.join("/Users/DELL/Desktop/ASL_marios/", "model_landmarks_augment.pkl")
+        le_path = os.path.join("/Users/DELL/Desktop/ASL_marios/", "label_encoder_augment.pkl")
+        model = joblib.load(model_path)
+        le = joblib.load(le_path)
 
         # Initialize mediapipe Hands
         mp_hands = mp.solutions.hands
